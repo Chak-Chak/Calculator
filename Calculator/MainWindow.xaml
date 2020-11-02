@@ -5,55 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Calculator"
         mc:Ignorable="d"
-        Title="Калькулятор" Height="500" Width="350">
+        Title="Калькулятор" Height="500" Width="650"
+        d:DataContext="{d:DesignInstance local:ViewModel}">
     <Window.Background>
         <SolidColorBrush Opacity="0.5" Color="White"/>
     </Window.Background>
     <Grid Background="#FFF">
         <Grid  Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="60"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
             <Grid Background="#1a4bff" Opacity="0.7" Grid.Row="0"  Grid.Column="0"  Grid.ColumnSpan="4">
                 <TextBlock Text="{Binding TextBlock}" Margin="0,0,0,2" FontSize="24"  HorizontalAlignment="Right" Style="{StaticResource TextBlockStyle}">
-            </TextBlock>
-        </Grid>
-        
-        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" Margin="0,0,0,8">
-                <TextBlock Text="{Binding TextExample}" FontSize="14" HorizontalAlignment="Left"/>
-        </ScrollViewer>
+                </TextBlock>
+            </Grid>
 
-        <Button Grid.Column="0" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">1</Button>
-        <Button Grid.Column="1" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">2</Button>
-        <Button Grid.Column="2" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">3</Button>
-        <Button Grid.Column="0" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">4</Button>
-        <Button Grid.Column="1" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">5</Button>
-        <Button Grid.Column="2" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">6</Button>
-        <Button Grid.Column="0" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">7</Button>
-        <Button Grid.Column="1" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">8</Button>
-        <Button Grid.Column="2" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">9</Button>
-        <Button Grid.Column="1" Grid.Row="6" Margin="2" FontSize="18" Command="{Binding AddNumber}" Grid.ColumnSpan="2" Style="{StaticResource ButtonStyle}">0</Button>
-        <Button Grid.Column="0" Grid.Row="6" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">00</Button>
-        <Button Grid.Column="3" Grid.Row="6" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">=</Button>
-        <Button Grid.Column="3" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">-</Button>
-        <Button Grid.Column="3" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">+</Button>
-        <Button Grid.Column="3" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">*</Button>
-        <Button Grid.Column="3" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">/</Button>
-        <Button Grid.Column="0" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">Back</Button>
-        <Button Grid.Column="2" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding Clear}" Style="{StaticResource ButtonStyle}">C</Button>
-        <Button Grid.Column="1" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">CE</Button>
-    </Grid>
+            <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" Margin="0,0,0,8">
+                <TextBlock Text="{Binding TextExample}" FontSize="14" HorizontalAlignment="Left"/>
+            </ScrollViewer>
+
+            <Button Grid.Column="0" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">1</Button>
+            <Button Grid.Column="1" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">2</Button>
+            <Button Grid.Column="2" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">3</Button>
+            <Button Grid.Column="0" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">4</Button>
+            <Button Grid.Column="1" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">5</Button>
+            <Button Grid.Column="2" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">6</Button>
+            <Button Grid.Column="0" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">7</Button>
+            <Button Grid.Column="1" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">8</Button>
+            <Button Grid.Column="2" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">9</Button>
+            <Button Grid.Column="1" Grid.Row="6" Margin="2" FontSize="18" Command="{Binding AddNumber}" Grid.ColumnSpan="2" Style="{StaticResource ButtonStyle}">0</Button>
+            <Button Grid.Column="0" Grid.Row="6" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">00</Button>
+            <Button Grid.Column="3" Grid.Row="6" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">=</Button>
+            <Button Grid.Column="3" Grid.Row="5" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">-</Button>
+            <Button Grid.Column="3" Grid.Row="4" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">+</Button>
+            <Button Grid.Column="3" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">*</Button>
+            <Button Grid.Column="3" Grid.Row="3" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">/</Button>
+            <Button Grid.Column="0" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">Back</Button>
+            <Button Grid.Column="2" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding Clear}" Style="{StaticResource ButtonStyle}">C</Button>
+            <Button Grid.Column="1" Grid.Row="2" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">CE</Button>
+            <!--<ListView Grid.Column="4" HorizontalAlignment="Left" Height="447" Margin="22,0,0,0" Grid.RowSpan="7" VerticalAlignment="Top" Width="268">
+                
+            </ListView>-->
+            <TabControl Grid.Column="5" Grid.RowSpan="7">
+                <TabItem Header="History" Style="{StaticResource TabHeaderStyle}">
+                    <ItemsControl Grid.Column="4" Grid.RowSpan="7" ItemsSource="{Binding Expressions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type Expression}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Exp, Mode=OneWay}" Style="{StaticResource HistoryStyle}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Value, Mode=OneWay}" Style="{StaticResource HistoryStyle}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </TabItem>
+            </TabControl>
+            
+            
+        </Grid>
     </Grid>
 </Window>
