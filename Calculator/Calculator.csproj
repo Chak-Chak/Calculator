@@ -38,6 +38,9 @@
     <Reference Include="FluentWPF, Version=0.8.0.6, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentWPF.0.8.0\lib\net45\FluentWPF.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -58,10 +61,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="History.cs" />
-    <Compile Include="IHistory.cs" />
-    <Compile Include="IMemory.cs" />
-    <Compile Include="Memory.cs" />
+    <Compile Include="Models\History\History.cs" />
+    <Compile Include="Interfaces\IHistory.cs" />
+    <Compile Include="Interfaces\IMemory.cs" />
+    <Compile Include="Models\History\HistoryJSON.cs" />
+    <Compile Include="Models\Memory\Memory.cs" />
+    <Compile Include="Models\Memory\MemoryJSON.cs" />
+    <Compile Include="Models\Parse.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">

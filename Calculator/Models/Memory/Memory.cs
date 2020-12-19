@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using Calculator.Interfaces;
 
-namespace Calculator.Models
+namespace Calculator.Models.Memory
 {
     public class Memory : IMemory
     {
@@ -25,7 +19,7 @@ namespace Calculator.Models
 
         public void Clear()
         {
-            MemoryColl.Clear();
+            if (MemoryColl.Count > 0) MemoryColl.Clear();
         }
 
         public void Increase(int index, double value)

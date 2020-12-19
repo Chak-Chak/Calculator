@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using Calculator.Interfaces;
 
-namespace Calculator.Models
+namespace Calculator.Models.History
 {
     public class History : IHistory
     {
@@ -23,14 +17,14 @@ namespace Calculator.Models
             HistoryColl.Insert(0, expression);
         }
 
-        public void Clear()
-        {
-            HistoryColl.Clear();
-        }
-
         public void Delete(int index)
         {
             HistoryColl.RemoveAt(index);
+        }
+
+        public void Clear()
+        {
+            if (HistoryColl.Count > 0) HistoryColl.Clear();
         }
     }
 }
