@@ -153,6 +153,15 @@ namespace Calculator
             }, x => { if (countOpenBrackets > countCloseBrackets) return true; else return false; });
         }
 
+        private ICommand _clearHistory;
+        public ICommand ClearHistory
+        {
+            get => _clearHistory ?? new RelayCommand(() =>
+            {
+                History.Clear();
+            }, () => true);
+        }
+
         private ICommand _action;
         public ICommand Action
         {
