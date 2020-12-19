@@ -7,8 +7,10 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
-
+using Calculator.Interfaces;
+using Calculator.Models;
 
 namespace Calculator
 {
@@ -16,17 +18,20 @@ namespace Calculator
     {
         public ViewModel()
         {
-            _expression = new ObservableCollection<Expression>();
+            Memory = new Memory();
+            History = new History();
         }
+        public IMemory Memory { get; }
+        public IHistory History { get; }
 
         public string leftValue { get; set; } = null;
         public long? rightValue { get; set; } = null;
 
         public string mark = "";
         public long? resultValue { get; set; } = null;
-
-        public bool isFinished = false;
-        public bool isSetNumber = true;
+        string result = "";
+        private int countCloseBrackets = 0;
+        private int countOpenBrackets = 0;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -34,6 +39,7 @@ namespace Calculator
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
 
         private string textBlock = "0";
 
@@ -63,11 +69,6 @@ namespace Calculator
         {
             get => _addNumber ?? new RelayCommand<string>(x =>
             {
-                /*if (isFinished)
-                {
-                    //TextBlock = "0";
-                    isFinished = false;
-                }*/
                 if ("0123456789".IndexOf(x) != -1)
                 {
                     if (TextBlock == "0" || TextBlock == null)
@@ -83,7 +84,8 @@ namespace Calculator
                             return;
                         }
                     }
-                    isSetNumber = true;
+
+                    if (TextBlock[TextBlock.Length - 1] == ')') return;
                     TextBlock += x;
                     TextExample = mark;
                     mark = "";
@@ -101,91 +103,99 @@ namespace Calculator
                         mark = "";
                     }
 
+                    if (TextBlock[TextBlock.Length - 1] == '(') countOpenBrackets--;
+                    if (TextBlock[TextBlock.Length - 1] == ')') countCloseBrackets--;
+
                     TextBlock = TextBlock.Remove(TextBlock.Count() - 1);
+                }
+                if ((result = Calc.Parse(TextBlock)) != "error") { TextExample = result; }
+                else { TextExample = null; }
+            }, x => true);
+        }
+
+        private ICommand _addOpenBracket;
+        public ICommand AddOpenBracket
+        {
+            get => _addOpenBracket ?? new RelayCommand<string>(x =>
+            {
+                if (x == "(")
+                {
+                    if (TextBlock == "0")
+                    {
+                        TextBlock = "(";
+                        countOpenBrackets++;
+                    }
+                    else
+                    {
+                        if ("(+-*/".IndexOf(TextBlock[TextBlock.Length - 1]) != -1)
+                        {
+                            TextBlock += "(";
+                            countOpenBrackets++;
+                        }
+                    }
                 }
             }, x => true);
         }
 
-        //leftValue = Int64.Parse(textBlock.Text);
-        //textExample.Text = leftValue + buttonText;
+        private ICommand _addCloseBracket;
+        public ICommand AddCloseBracket
+        {
+            get => _addCloseBracket ?? new RelayCommand<string>(x =>
+            {
+                if (x == ")")
+                {
+                    if (("0123456789".IndexOf(TextBlock[TextBlock.Length - 1]) != -1) || TextBlock[TextBlock.Length - 1] == ')')
+                    {
+                        TextBlock += ")";
+                        countCloseBrackets++;
+                    }
+                }
+            }, x => { if (countOpenBrackets > countCloseBrackets) return true; else return false; });
+        }
 
         private ICommand _action;
         public ICommand Action
         {
             get => _action ?? new RelayCommand<string>(x =>
             {
-                //isFinished = true;
-                /*if (leftValue == "")
-                {
-                    //leftValue = Int64.Parse(TextBlock);
-                    mark = x == "=" ? null : x;
-                    //TextBlock = "0";
-                    return;
-                }*/
-                /*if (mark == null)
-                {
-                    if (x == "=") return;
-                    mark = x;
-                    //leftValue = Int64.Parse(TextBlock);
-                    return;
-                }*/
                 switch (x)
                 {
                     case "+":
                     case "-":
                     case "*":
                     case "/":
+                    {
+                        if ((TextBlock.Length - 1 >= 0) && ("+-*/".IndexOf(TextBlock[TextBlock.Length - 1]) != -1))
                         {
-                            if ((TextBlock.Length - 1 >= 0) && ("+-*/".IndexOf(TextBlock[TextBlock.Length - 1]) != -1))
+                            //MessageBox.Show("Изменение знака!");
+                            TextBlock = TextBlock.Remove(TextBlock.Length - 1);
+                            TextBlock += x;
+                            mark = x;
+                        }
+                        else
+                        {
+                            if ((mark == "") && (TextBlock.Length - 1 >= 0) && 
+                                (("0123456789".IndexOf(TextBlock[TextBlock.Length - 1]) != -1) || (TextBlock[TextBlock.Length - 1] == ')')))
                             {
-                                //MessageBox.Show("Изменение знака!");
-                                TextBlock = TextBlock.Remove(TextBlock.Length - 1);
+                                //MessageBox.Show("Вставка знака!");
                                 TextBlock += x;
                                 mark = x;
                             }
-                            else
-                            {
-                                if ((mark == "") && (TextBlock.Length - 1 >= 0) && ("0123456789".IndexOf(TextBlock[TextBlock.Length - 1]) != -1))
-                                {
-                                    //MessageBox.Show("Вставка знака!");
-                                    //leftValue = Int64.Parse(TextBlock);
-                                    TextBlock += x;
-                                    //TextBlock = "0";
-                                    mark = x;
-                                }
-                                /*else
-                                {
-                                    //MessageBox.Show("Вычисление!");
-                                    TextBlock += x;
-                                    rightValue = Int64.Parse(TextBlock);
-                                    calculate();
-                                    TextExample = resultValue + x;
-                                    leftValue = resultValue;
-                                    rightValue = null;
-                                    resultValue = null;
-                                    TextBlock = "0";
-                                }*/
-                            }
-                            break;
                         }
-
-                    default: break;
-                }
-                if (x == "=")
-                {
-                    string result = Calc.Parse(TextBlock);
-                    Expressions.Add(new Expression(TextBlock, result));
-                    /*if ((leftValue != null) && (mark != null))
+                        break;
+                    }
+                    case "CE":
                     {
-                        rightValue = Int64.Parse(TextBlock);
-                        //calculate();
-                        TextExample = resultValue.ToString();
-                        //leftValue = resultValue;
-                        rightValue = null;
-                        mark = null;
-                        resultValue = null;
                         TextBlock = "0";
-                    }*/
+                        break;
+                    }
+                    case "=":
+                    {
+                        result = Calc.Parse(TextBlock);
+                        History.Add(new Expression(TextBlock, result));
+                        break;
+                    }
+                    default: break;
                 }
             }, x => true);
         }
@@ -199,134 +209,272 @@ namespace Calculator
                 TextExample = "0";
                 leftValue = null;
                 mark = null;
-                //isFinished = false;
             }, () => true);
         }
 
-        private ObservableCollection<Expression> _expression;
-        public ObservableCollection<Expression> Expressions
+        private ICommand _historyDelete;
+
+        public ICommand HistoryDelete
         {
-            get => _expression;
+            get => _historyDelete ?? new RelayCommand<TextBlock>(x =>
+                {
+                    History.Delete((int)x.Tag);
+                }, x => true);
         }
 
-        /*public void calculate()
+        private ICommand _memoryActionPlus;
+        public ICommand MemoryActionPlus
         {
-            switch (mark)
+            get => _memoryActionPlus ?? new RelayCommand<TextBlock>(x =>
             {
-                case "+":
-                    {
-                        resultValue = leftValue + rightValue;
-                        break;
-                    }
-                case "-":
-                    {
-                        resultValue = leftValue - rightValue;
-                        break;
-                    }
-                case "*":
-                    {
-                        resultValue = leftValue - rightValue;
-                        break;
-                    }
-                case "/":
-                    {
-                        if (rightValue != 0)
-                            resultValue = leftValue / rightValue;
-                        break;
-                    }
-            }
-        }*/
+                double temp = Convert.ToDouble(x.Text);
+                temp += Convert.ToDouble(TextExample);
+                x.Text = temp.ToString();
+
+            }, x => { if (TextExample == "") return false; else return true; });
+        }
+
+        private ICommand _memoryActionMinus;
+        public ICommand MemoryActionMinus
+        {
+            get => _memoryActionMinus ?? new RelayCommand<TextBlock>(x =>
+            {
+                double temp = Convert.ToDouble(x.Text);
+                temp -= Convert.ToDouble(TextExample);
+                x.Text = temp.ToString();
+
+            }, x => { if (TextExample == "") return false; else return true; });
+        }
+
+        private ICommand _memoryActionClear;
+        public ICommand MemoryActionClear
+        {
+            get => _memoryActionClear ?? new RelayCommand<TextBlock>(x =>
+            {
+                Memory.Delete((int)x.Tag);
+            }, x => true);
+        }
+
+        private ICommand _memoryActionSave;
+        public ICommand MemoryActionSave
+        {
+            get => _memoryActionSave ?? new RelayCommand<string>(x =>
+            {
+                Memory.Add(Convert.ToDouble(TextExample));
+            }, x => { if (TextExample == "") return false; else return true; });
+        }
+
+        private ICommand _memoryActionReset;
+        public ICommand MemoryActionReset
+        {
+            get => _memoryActionReset ?? new RelayCommand<string>(x =>
+            {
+                History.Clear();
+            }, x => true);
+        }
+
 
         public static class Calc
         {
             public static string Parse(string expression)
             {
                 expression = expression.Replace(" ", "");
-                double result = 0;
+                string result = "";
                 char operation = 'n';
                 string leftValue = "", rightValue = "", action = "";
                 int indexStartBrackets = -1, indexEndBrackets = -1;
+                int countStartBrackets = 0, countEndBrackets = 0;
                 int indexStartMultiply;
                 string tempExpression = "";
 
                 while (expression.Length != 0)
                 {
-                    if ((indexStartBrackets = expression.IndexOf('(')) > -1)
+                    for (int j = 0; j < expression.Length; j++)
                     {
-                        if ((indexEndBrackets = expression.IndexOf(')')) > -1)
+                        if (expression[j] == '(')
                         {
-                            tempExpression = expression.Substring(indexStartBrackets + 1, indexEndBrackets - indexStartBrackets - 1);
-                            tempExpression = Parse(tempExpression);
-                            expression = expression.Remove(indexEndBrackets, 1);
-                            expression = expression.Remove(indexStartBrackets, 1);
-                            indexEndBrackets = indexEndBrackets - 2;
-                            expression = expression.Remove(indexStartBrackets, indexEndBrackets - indexStartBrackets + 1);
-                            expression = expression.Insert(indexStartBrackets, tempExpression);
+                            indexStartBrackets = j;
+                            countStartBrackets++;
                         }
-                        else
+                        if (expression[j] == ')')
                         {
-                            return expression = "error";
-                        }
-                    }
-                    else
-                    {
-                        for (int i = 0; i < expression.Length; i++)
-                        {
-                            if (((indexStartMultiply = expression.IndexOf('*')) > -1) || (indexStartMultiply = expression.IndexOf('/')) > -1)
+                            if (countEndBrackets == 0)
                             {
-                                while ((indexStartMultiply - 1 >= 0) && (expression[indexStartMultiply - 1] != '+') && (expression[indexStartMultiply - 1] != '-'))
-                                {
-                                    indexStartMultiply--;
-                                }
-                                leftValue = FindValue(expression, indexStartMultiply);
-                                expression = expression.Remove(indexStartMultiply, leftValue.Length);
-                                operation = expression[indexStartMultiply];
-                                expression = expression.Remove(indexStartMultiply, 1);
-                                if (indexStartMultiply != expression.Length - 1)
-                                {
-                                    rightValue = FindValue(expression, indexStartMultiply);
-                                    expression = expression.Remove(indexStartMultiply, rightValue.Length);
-                                }
-                                else
-                                {
-                                    rightValue = "0";
-                                }
-                                result = calculation(leftValue, operation, rightValue);
-                                expression = expression.Insert(indexStartMultiply, result.ToString());
-                                leftValue = "";
-                                rightValue = "";
-                                operation = 'n';
+                                indexEndBrackets = j;
+                                countEndBrackets++;
                             }
                             else
                             {
-                                if ((expression[0] == '*') || (expression[0] == '/'))
+                                countEndBrackets++;
+                            }
+                        }
+                    }
+                    if (countStartBrackets == countEndBrackets)
+                    {
+                        if (countStartBrackets != 0)
+                        {
+                            if (indexEndBrackets > 1)
+                            {
+                                for (int j = 0; j < expression.Length; j++)
                                 {
-                                    return expression = "error";
-                                }
-                                else
-                                {
-                                    if (leftValue.Length == 0)
+                                    if (expression[j] == ')')
                                     {
-                                        leftValue = FindValue(expression);
-                                        expression = expression.Substring(leftValue.Length);
+                                        indexEndBrackets = j;
+                                        break;
                                     }
-                                    int Length = expression.Length; // debug
-                                    if ((expression.Length != 0) && ((expression[0] == '+') || (expression[0] == '-')))
+                                }
+                            }
+                            tempExpression = expression.Substring(indexStartBrackets + 1, indexEndBrackets - indexStartBrackets - 1);
+                            tempExpression = Parse(tempExpression);
+                            if (Convert.ToDouble(tempExpression) >= 0)
+                            {
+                                expression = expression.Remove(indexEndBrackets, 1);
+                                expression = expression.Remove(indexStartBrackets, 1);
+                                indexEndBrackets = indexEndBrackets - 2;
+                                expression = expression.Remove(indexStartBrackets, indexEndBrackets - indexStartBrackets + 1);
+                                expression = expression.Insert(indexStartBrackets, tempExpression);
+                            }
+                            else
+                            {
+                                indexEndBrackets = indexEndBrackets - 1;
+                                expression = expression.Remove(indexStartBrackets + 1, indexEndBrackets - indexStartBrackets);
+                                expression = expression.Insert(indexStartBrackets + 1, tempExpression);
+                            }
+                            countStartBrackets = 0;
+                            countEndBrackets = 0;
+                            continue;
+                        }
+                    }
+                    else { return expression = "error"; }
+
+                    for (int i = 0; i < expression.Length; i++)
+                    {
+                        if (((indexStartMultiply = expression.IndexOf('*')) > -1) || (indexStartMultiply = expression.IndexOf('/')) > -1)
+                        {
+                            if (indexStartMultiply - 1 >= 0)
+                            {
+                                if (expression[indexStartMultiply - 1] == ')')
+                                {
+                                    while ((indexStartMultiply - 1 >= 0) && (expression[indexStartMultiply - 1] != '('))
                                     {
-                                        operation = expression[0];
-                                        expression = expression.Substring(1);
+                                        indexStartMultiply--;
+                                    }
+                                    indexStartMultiply--;
+                                    leftValue = FindValue(expression, indexStartMultiply);
+                                    expression = expression.Remove(indexStartMultiply, leftValue.Length);
+                                    operation = expression[indexStartMultiply];
+                                    expression = expression.Remove(indexStartMultiply, 1);
+                                    if (indexStartMultiply != expression.Length - 1)
+                                    {
+                                        rightValue = FindValue(expression, indexStartMultiply);
+                                        expression = expression.Remove(indexStartMultiply, rightValue.Length);
                                     }
                                     else
                                     {
-                                        expression = leftValue;
-                                        return expression;
+                                        rightValue = "0";
                                     }
-                                    rightValue = FindValue(expression);
-                                    expression = expression.Substring(rightValue.Length);
+                                    leftValue = leftValue.Replace("(", "");
+                                    leftValue = leftValue.Replace(")", "");
+                                    rightValue = rightValue.Replace("(", "");
+                                    rightValue = rightValue.Replace(")", "");
                                     result = calculation(leftValue, operation, rightValue);
-                                    leftValue = result.ToString();
+                                    expression = expression.Insert(indexStartMultiply, result.ToString());
+                                    leftValue = "";
+                                    rightValue = "";
                                     operation = 'n';
                                 }
+                                else
+                                {
+                                    while (true)
+                                    {
+                                        if (indexStartMultiply - 1 >= 0)
+                                        {
+                                            if ((expression[indexStartMultiply - 1] != '+') ||
+                                                (expression[indexStartMultiply - 1] != '-') ||
+                                                (expression[indexStartMultiply - 1] != '/'))
+                                            {
+                                                indexStartMultiply--;
+                                                continue;
+                                            }
+                                            else break;
+                                        }
+                                        else break;
+                                    }
+                                    leftValue = FindValue(expression, indexStartMultiply);
+                                    expression = expression.Remove(indexStartMultiply, leftValue.Length);
+                                    operation = expression[indexStartMultiply];
+                                    expression = expression.Remove(indexStartMultiply, 1);
+                                    if (indexStartMultiply != expression.Length)
+                                    {
+                                        rightValue = FindValue(expression, indexStartMultiply);
+                                        expression = expression.Remove(indexStartMultiply, rightValue.Length);
+                                    }
+                                    else
+                                    {
+                                        rightValue = "0";
+                                    }
+                                    leftValue = leftValue.Replace("(", "");
+                                    leftValue = leftValue.Replace(")", "");
+                                    rightValue = rightValue.Replace("(", "");
+                                    rightValue = rightValue.Replace(")", "");
+                                    result = calculation(leftValue, operation, rightValue);
+                                    expression = expression.Insert(indexStartMultiply, result.ToString());
+                                    leftValue = "";
+                                    rightValue = "";
+                                    operation = 'n';
+                                }
+                            }
+                            else
+                            {
+                                return expression = "error";
+                            }
+                        }
+                        else
+                        {
+                            if ((expression[0] == '*') || (expression[0] == '/'))
+                            {
+                                return expression = "error";
+                            }
+                            else
+                            {
+                                if (leftValue == "")
+                                {
+                                    if (expression[0] == '(')
+                                    {
+                                        leftValue = FindValue(expression);
+                                        expression = expression.Remove(0, leftValue.Length);
+                                    }
+                                    else
+                                    {
+                                        leftValue = FindValue(expression);
+                                        expression = expression.Remove(0, leftValue.Length);
+                                    }
+                                }
+                                int Length = expression.Length; // debug
+                                if ((expression.Length != 0) && ((expression[0] == '+') || (expression[0] == '-')))
+                                {
+                                    operation = expression[0];
+                                    expression = expression.Substring(1);
+                                }
+                                if ((expression != "") && (expression[0] == '('))
+                                {
+                                    rightValue = FindValue(expression);
+                                    expression = expression.Remove(0, rightValue.Length);
+                                }
+                                else
+                                {
+                                    rightValue = FindValue(expression);
+                                    expression = expression.Remove(0, rightValue.Length);
+                                }
+                                if (leftValue == "")
+                                    leftValue = "0";
+                                if (rightValue == "")
+                                    return leftValue;
+                                result = calculation(leftValue, operation, rightValue);
+                                expression = expression.Insert(0, result);
+                                leftValue = "";
+                                rightValue = "";
+                                operation = 'n';
                             }
                         }
                     }
@@ -376,38 +524,44 @@ namespace Calculator
                 return value;
             }
 
-            public static double calculation(string leftValue, char operation, string rightValue)
+            public static string calculation(string leftValue, char operation, string rightValue)
             {
-                double result = 0;
-                switch (operation)
+                string result = "";
+                try
                 {
-                    case '+':
+                    switch (operation)
+                    {
+                        case '+':
                         {
-                            result = Convert.ToDouble(leftValue) + Convert.ToDouble(rightValue);
+                            result = (Convert.ToDouble(leftValue) + Convert.ToDouble(rightValue)).ToString();
                             break;
                         }
-                    case '-':
+                        case '-':
                         {
-                            result = Convert.ToDouble(leftValue) - Convert.ToDouble(rightValue);
+                            result = (Convert.ToDouble(leftValue) - Convert.ToDouble(rightValue)).ToString();
                             break;
                         }
-                    case '*':
+                        case '*':
                         {
-                            result = Convert.ToDouble(leftValue) * Convert.ToDouble(rightValue);
+                            result = (Convert.ToDouble(leftValue) * Convert.ToDouble(rightValue)).ToString();
                             break;
                         }
-                    case '/':
+                        case '/':
                         {
-                            result = Convert.ToDouble(leftValue) / Convert.ToDouble(rightValue);
+                            result = (Convert.ToDouble(leftValue) / Convert.ToDouble(rightValue)).ToString();
                             break;
                         }
+                    }
+                    return result.ToString();
                 }
-                return result;
+                catch
+                {
+                    return result = "error";
+                }
             }
 
         }
     }
-
     public class Expression
     {
         public Expression(string exp, string answer)
