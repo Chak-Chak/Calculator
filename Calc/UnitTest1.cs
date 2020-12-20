@@ -17,9 +17,9 @@ namespace Calc
         public void Test1()
         {
             var calc = new Calc();
-            var result = calc.Parse("5,145/56");
+            var result = calc.Parse("5+5");
 
-            Convert.ToDouble(result).Should().Be(0.091875).And.BePositive("Upsssss");
+            Convert.ToDouble(result).Should().Be(10).And.BePositive("Upsssss");
         }
     }
 
