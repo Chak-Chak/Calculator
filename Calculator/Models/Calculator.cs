@@ -261,26 +261,97 @@ namespace Calculator.Models
             return value;
         }
 
-        public static string calculation(string leftValue, char operation, string rightValue)
+        public string calculation(string leftValue, char operation, string rightValue)
         {
             string result = "";
+            int leftValueLength = leftValue.Length;
+            int rightValueLength = rightValue.Length;
+            int countLeftValueCharAfterPoint = 0;
+            int countRightValueCharAfterPoint = 0;
+            int leftValuePointPosition = -1;
+            int rightValuePointPosition = -1;
+
             try
             {
+                for (int i = 0; i < leftValue.Length; i++)
+                {
+                    if ((leftValue[i] == '.') || (leftValue[i] == ','))
+                    {
+                        leftValuePointPosition = i;
+                        for (int j = leftValuePointPosition + 1; j < leftValue.Length; j++)
+                        {
+                            countLeftValueCharAfterPoint++;
+                        }
+                        break;
+                    }
+                }
+
+                for (int i = 0; i < rightValue.Length; i++)
+                {
+                    if ((rightValue[i] == '.') || (rightValue[i] == ','))
+                    {
+                        rightValuePointPosition = i;
+                        for (int j = rightValuePointPosition + 1; j < rightValue.Length; j++)
+                        {
+                            countRightValueCharAfterPoint++;
+                        }
+                        break;
+                    }
+                }
+
+                leftValue = leftValue.Replace(".", ",");
+                rightValue = rightValue.Replace(".", ",");
+                double tempLeftValue = Convert.ToDouble(leftValue);
+                double tempRightValue = Convert.ToDouble(rightValue);
+                if (countLeftValueCharAfterPoint >= countRightValueCharAfterPoint)
+                {
+                    for (int i = 0; i < countLeftValueCharAfterPoint; i++)
+                    {
+                        tempLeftValue = tempLeftValue * 10;
+                        tempRightValue = tempRightValue * 10;
+                    }
+                }
+                else
+                {
+                    if (countLeftValueCharAfterPoint < countRightValueCharAfterPoint)
+                    {
+                        for (int i = 0; i < countRightValueCharAfterPoint; i++)
+                        {
+                            tempLeftValue = tempLeftValue * 10;
+                            tempRightValue = tempRightValue * 10;
+                        }
+                    }
+                }
+
+                leftValue = tempLeftValue.ToString();
+                rightValue = tempRightValue.ToString();
                 switch (operation)
                 {
                     case '+':
                         {
                             result = (Convert.ToDouble(leftValue) + Convert.ToDouble(rightValue)).ToString();
+                            if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition > rightValuePointPosition))
+                                result = result.Insert(leftValuePointPosition, ",");
+                            else if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition < rightValuePointPosition)) result = result.Insert(rightValuePointPosition, ",");
+                            if ((leftValuePointPosition <= 0) && (rightValuePointPosition > 0)) result = result.Insert(rightValuePointPosition, ",");
+                            if ((leftValuePointPosition > 0) && (rightValuePointPosition <= 0)) result = result.Insert(leftValuePointPosition, ",");
                             break;
                         }
                     case '-':
                         {
                             result = (Convert.ToDouble(leftValue) - Convert.ToDouble(rightValue)).ToString();
+                            if (Convert.ToDouble(leftValue) < Convert.ToDouble(rightValue))
+                                if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition > rightValuePointPosition))
+                                    result = result.Insert(leftValuePointPosition, ",");
+                                else if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition < rightValuePointPosition)) result = result.Insert(rightValuePointPosition, ",");
+                            if ((leftValuePointPosition <= 0) && (rightValuePointPosition > 0)) result = result.Insert(rightValuePointPosition, ",");
+                            if ((leftValuePointPosition > 0) && (rightValuePointPosition <= 0)) result = result.Insert(leftValuePointPosition, ",");
                             break;
                         }
                     case '*':
                         {
                             result = (Convert.ToDouble(leftValue) * Convert.ToDouble(rightValue)).ToString();
+                            result = result.Insert(result.Length - countLeftValueCharAfterPoint - countRightValueCharAfterPoint, ",");
                             break;
                         }
                     case '/':
@@ -289,7 +360,7 @@ namespace Calculator.Models
                             break;
                         }
                 }
-                return result.ToString();
+                return result;
             }
             catch
             {

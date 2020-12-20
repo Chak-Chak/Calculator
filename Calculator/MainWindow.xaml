@@ -6,7 +6,7 @@
         xmlns:fw="clr-namespace:SourceChord.FluentWPF;assembly=FluentWPF"
         xmlns:local="clr-namespace:Calculator"
         mc:Ignorable="d"
-        Title="Калькулятор" Height="500" Width="650"
+        Title="Калькулятор" Height="500" MinWidth="750"
         fw:AcrylicWindow.Enabled="True"
         d:DataContext="{d:DesignInstance local:ViewModel}"
         Name="MainWin">
@@ -21,7 +21,7 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition MinWidth="300"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" Grid.ColumnSpan="1" Grid.RowSpan="2">
                 <Grid.RowDefinitions>
@@ -66,8 +66,9 @@
                 <Button Grid.Column="0" Grid.Row="8" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">7</Button>
                 <Button Grid.Column="1" Grid.Row="8" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">8</Button>
                 <Button Grid.Column="2" Grid.Row="8" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">9</Button>
-                <Button Grid.Column="1" Grid.Row="9" Margin="2" FontSize="18" Command="{Binding AddNumber}" Grid.ColumnSpan="2" Style="{StaticResource ButtonStyle}">0</Button>
+                <Button Grid.Column="1" Grid.Row="9" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">0</Button>
                 <Button Grid.Column="0" Grid.Row="9" Margin="2" FontSize="18" Command="{Binding AddNumber}" Style="{StaticResource ButtonStyle}">00</Button>
+                <Button Grid.Column="2" Grid.Row="9" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">,</Button>
                 <Button Grid.Column="3" Grid.Row="9" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">=</Button>
                 <Button Grid.Column="3" Grid.Row="8" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">-</Button>
                 <Button Grid.Column="3" Grid.Row="7" Margin="2" FontSize="18" Command="{Binding Action}" Style="{StaticResource ButtonStyle}">+</Button>
@@ -130,12 +131,12 @@
                                                 DataContext="{Binding ElementName=MainWin, Path=DataContext}" 
                                                 Command="{Binding HistoryDelete}" Style="{StaticResource ButtonStyle}" 
                                                 CommandParameter="{Binding ElementName=History, Path=.}">Delete</Button>
-                                        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Grid.Column="1" Margin="0,0,0,8">
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto"  VerticalScrollBarVisibility="Disabled" Grid.Column="1" Margin="0,0,0,8">
                                             <TextBlock Name="History" Grid.Column="1" Text="{Binding Exp, Mode=OneWay}" Style="{StaticResource HistoryStyle}"
                                                    Tag="{Binding Path=(ItemsControl.AlternationIndex), RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </ScrollViewer>
 
-                                        <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Disabled" Grid.Column="2" Margin="0,0,0,8">
+                                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Grid.Column="2" Margin="0,0,0,8">
                                             <TextBlock Grid.Column="2" Text="{Binding Value, Mode=OneWay}" Style="{StaticResource HistoryStyle}"
                                                    Tag="{Binding Path=(ItemsControl.AlternationIndex), RelativeSource={RelativeSource TemplatedParent}}"/>
                                         </ScrollViewer>

@@ -21,12 +21,12 @@ namespace Calculator
         public ViewModel()
         {
             Calc = new Calc();
-            /*Memory = new Memory();
-            History = new History();*/
+            Memory = new Memory();
+            History = new History();
             /*Memory = new MemoryJSON();
             History = new HistoryJSON();*/
-            Memory = new MemoryDB();
-            History = new HistoryDB();
+            /*Memory = new MemoryDB();
+            History = new HistoryDB();*/
         }
         public IMemory Memory { get; }
         public IHistory History { get; }
@@ -40,7 +40,7 @@ namespace Calculator
         string result = "";
         private int countCloseBrackets = 0;
         private int countOpenBrackets = 0;
-
+        public bool canBePoint = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
@@ -177,6 +177,11 @@ namespace Calculator
             {
                 switch (x)
                 {
+                    /*case ".":
+                    {
+                        if ()
+                        break;
+                    }*/
                     case "+":
                     case "-":
                     case "*":
