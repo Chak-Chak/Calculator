@@ -199,7 +199,7 @@ namespace Calc
                                     expression = expression.Remove(0, leftValue.Length);
                                 }
                             }
-                            int Length = expression.Length; // debug
+                            int Length = expression.Length;
                             if ((expression.Length != 0) && ((expression[0] == '+') || (expression[0] == '-')))
                             {
                                 operation = expression[0];
@@ -215,21 +215,14 @@ namespace Calc
                                 rightValue = FindValue(expression);
                                 expression = expression.Remove(0, rightValue.Length);
                             }
-                            /*leftValue = leftValue.Replace("(", "");
-                            leftValue = leftValue.Replace(")", "");
-                            rightValue = rightValue.Replace("(", "");
-                            rightValue = rightValue.Replace(")", "");*/
                             if (leftValue == "") 
                                 leftValue = "0";
                             if (rightValue == "")
                                 return leftValue;
-                            /*expression = expression.Replace("(", "");
-                            expression = expression.Replace(")", "");*/
                             result = calculation(leftValue, operation, rightValue);
                             expression = expression.Insert(0, result);
                             leftValue = "";
                             rightValue = "";
-                            //leftValue = result.ToString();
                             operation = 'n';
                         }
                     }
@@ -268,23 +261,6 @@ namespace Calc
             }
             return value;
         }
-
-        /*public string FindRightValue(string expression, int indexStart = 0)
-        {
-            string value = "";
-            for (int i = indexStart; i < expression.Length; i++)
-            {
-                if ((expression[i] == '+') || (expression[i] == '-') || (expression[i] == '*') || (expression[i] == '/'))
-                {
-                    return value;
-                }
-                else
-                {
-                    value += expression[i];
-                }
-            }
-            return value;
-        }*/
 
         public string calculation(string leftValue, char operation, string rightValue)
         {
