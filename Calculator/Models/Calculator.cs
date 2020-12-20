@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Calculator.Interfaces;
 
-namespace Calculator
+namespace Calculator.Models
 {
-    class Parse
+    public class Calc : ICalculator
     {
-        public static string Parsing(string expression)
+        public Calc()
+        {
+
+        }
+        public string Parse(string expression)
         {
             expression = expression.Replace(" ", "");
             string result = "";
@@ -57,7 +62,7 @@ namespace Calculator
                             }
                         }
                         tempExpression = expression.Substring(indexStartBrackets + 1, indexEndBrackets - indexStartBrackets - 1);
-                        tempExpression = Parsing(tempExpression);
+                        tempExpression = Parse(tempExpression);
                         if (Convert.ToDouble(tempExpression) >= 0)
                         {
                             expression = expression.Remove(indexEndBrackets, 1);

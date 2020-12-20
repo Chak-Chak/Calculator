@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Calculator.Interfaces;
+using Calculator.Models;
 using Calculator.Models.History;
 using Calculator.Models.Memory;
 
@@ -19,13 +20,17 @@ namespace Calculator
     {
         public ViewModel()
         {
+            Calc = new Calc();
             /*Memory = new Memory();
             History = new History();*/
-            Memory = new MemoryJSON();
-            History = new HistoryJSON();
+            /*Memory = new MemoryJSON();
+            History = new HistoryJSON();*/
+            Memory = new MemoryDB();
+            History = new HistoryDB();
         }
         public IMemory Memory { get; }
         public IHistory History { get; }
+        public ICalculator Calc;
 
         public string leftValue { get; set; } = null;
         public long? rightValue { get; set; } = null;
@@ -111,7 +116,7 @@ namespace Calculator
 
                     TextBlock = TextBlock.Remove(TextBlock.Count() - 1);
                 }
-                if ((result = Parse.Parsing(TextBlock)) != "error") { TextExample = result; }
+                if ((result = Calc.Parse(TextBlock)) != "error") { TextExample = result; }
                 else { TextExample = null; }
             }, x => true);
         }
@@ -203,7 +208,7 @@ namespace Calculator
                     }
                     case "=":
                     {
-                        result = Parse.Parsing(TextBlock);
+                        result = Calc.Parse(TextBlock);
                         History.Add(new Expression(TextBlock, result));
                         break;
                     }

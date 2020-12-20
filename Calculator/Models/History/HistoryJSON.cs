@@ -25,7 +25,7 @@ namespace Calculator.Models.History
         }
         public void Add(Expression expression)
         {
-            HistoryColl.Insert(0, expression);
+            HistoryColl.Add(expression);
             SaveToJson();
         }
 
