@@ -40,7 +40,7 @@ namespace Calculator
         string result = "";
         private int countCloseBrackets = 0;
         private int countOpenBrackets = 0;
-        public bool canBePoint = false;
+        public bool canDrawPoint = true;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
@@ -89,9 +89,11 @@ namespace Calculator
                         else
                         {
                             TextBlock = x;
+                            TextExample = x;
                             return;
                         }
                     }
+                    
 
                     if (TextBlock[TextBlock.Length - 1] == ')') return;
                     TextBlock += x;
@@ -109,6 +111,11 @@ namespace Calculator
                     {
                         TextExample = mark;
                         mark = "";
+                    }
+
+                    if (",".IndexOf(TextBlock[TextBlock.Length - 1]) != -1)
+                    {
+                        canDrawPoint = true;
                     }
 
                     if (TextBlock[TextBlock.Length - 1] == '(') countOpenBrackets--;
@@ -132,6 +139,7 @@ namespace Calculator
                     {
                         TextBlock = "(";
                         countOpenBrackets++;
+                        canDrawPoint = false;
                     }
                     else
                     {
@@ -139,6 +147,7 @@ namespace Calculator
                         {
                             TextBlock += "(";
                             countOpenBrackets++;
+                            canDrawPoint = false;
                         }
                     }
                 }
@@ -156,6 +165,7 @@ namespace Calculator
                     {
                         TextBlock += ")";
                         countCloseBrackets++;
+                        canDrawPoint = false;
                     }
                 }
             }, x => { if (countOpenBrackets > countCloseBrackets) return true; else return false; });
@@ -170,6 +180,18 @@ namespace Calculator
             }, () => { if (History.HistoryColl.Count > 0) return true; else return false; });
         }
 
+        private ICommand _pointAction;
+
+        public ICommand PointAction
+        {   
+
+            get => _pointAction ?? new RelayCommand<string>(x =>
+            {
+                TextBlock += x;
+                canDrawPoint = false;
+            }, x => canDrawPoint);
+        }
+
         private ICommand _action;
         public ICommand Action
         {
@@ -177,11 +199,6 @@ namespace Calculator
             {
                 switch (x)
                 {
-                    /*case ".":
-                    {
-                        if ()
-                        break;
-                    }*/
                     case "+":
                     case "-":
                     case "*":
@@ -202,6 +219,7 @@ namespace Calculator
                                 //MessageBox.Show("Вставка знака!");
                                 TextBlock += x;
                                 mark = x;
+                                canDrawPoint = false;
                             }
                         }
                         break;
@@ -209,6 +227,7 @@ namespace Calculator
                     case "CE":
                     {
                         TextBlock = "0";
+                        canDrawPoint = true;
                         break;
                     }
                     case "=":
@@ -231,6 +250,7 @@ namespace Calculator
                 TextExample = "0";
                 leftValue = null;
                 mark = null;
+                canDrawPoint = true;
             }, () => true);
         }
 
