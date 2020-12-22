@@ -187,6 +187,10 @@ namespace Calculator
 
             get => _pointAction ?? new RelayCommand<string>(x =>
             {
+                if ("+-*/".IndexOf(TextBlock[TextBlock.Length - 1]) != -1)
+                {
+                    TextBlock += 0;
+                }
                 TextBlock += x;
                 canDrawPoint = false;
             }, x => canDrawPoint);
@@ -219,7 +223,7 @@ namespace Calculator
                                 //MessageBox.Show("Вставка знака!");
                                 TextBlock += x;
                                 mark = x;
-                                canDrawPoint = false;
+                                canDrawPoint = true;
                             }
                         }
                         break;
