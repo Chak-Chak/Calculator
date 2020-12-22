@@ -17,9 +17,22 @@ namespace Calc
         public void Test1()
         {
             var calc = new Calc();
-            var result = calc.Parse("5+5");
+            var result = "";
 
-            Convert.ToDouble(result).Should().Be(10).And.BePositive("Upsssss");
+            result = calc.Parse("6.1+5,6");
+            Convert.ToDouble(result).Should().Be(11.7).And.BePositive("Upsssss");
+
+            result = calc.Parse("1.123-1,111");
+            Convert.ToDouble(result).Should().Be(0.012).And.BePositive("Upsssss");
+
+            result = calc.Parse("1,111-1,11");
+            Convert.ToDouble(result).Should().Be(0.001).And.BePositive("Upsssss");
+
+            result = calc.Parse("1,111*1,11");
+            Convert.ToDouble(result).Should().Be(1.23321).And.BePositive("Upsssss");
+
+            result = calc.Parse("6/10");
+            Convert.ToDouble(result).Should().Be(0.6).And.BePositive("Upsssss");
         }
     }
 
@@ -300,29 +313,24 @@ namespace Calc
                 }
             }
 
-            leftValue = leftValue.Replace(".", ",");
-            rightValue = rightValue.Replace(".", ",");
+            leftValue = leftValue.Replace(".", "");
+            rightValue = rightValue.Replace(".", "");
+            leftValue = leftValue.Replace(",", "");
+            rightValue = rightValue.Replace(",", "");
+
+            
+
+            if (countLeftValueCharAfterPoint > countRightValueCharAfterPoint)
+            {
+                for (int i = 0; i < countLeftValueCharAfterPoint - countRightValueCharAfterPoint; i++) { rightValue += "0"; countRightValueCharAfterPoint++; }
+            }
+            if (countLeftValueCharAfterPoint < countRightValueCharAfterPoint)
+            {
+                for (int i = 0; i < countRightValueCharAfterPoint - countLeftValueCharAfterPoint; i++) { leftValue += "0"; countLeftValueCharAfterPoint++; }
+            }
+
             double tempLeftValue = Convert.ToDouble(leftValue);
             double tempRightValue = Convert.ToDouble(rightValue);
-            if (countLeftValueCharAfterPoint >= countRightValueCharAfterPoint)
-            {
-                for (int i = 0; i < countLeftValueCharAfterPoint; i++)
-                {
-                    tempLeftValue = tempLeftValue * 10;
-                    tempRightValue = tempRightValue * 10;
-                }
-            }
-            else
-            {
-                if (countLeftValueCharAfterPoint < countRightValueCharAfterPoint)
-                {
-                    for (int i = 0; i < countRightValueCharAfterPoint; i++)
-                    {
-                        tempLeftValue = tempLeftValue * 10;
-                        tempRightValue = tempRightValue * 10;
-                    }
-                }
-            }
 
             leftValue = tempLeftValue.ToString();
             rightValue = tempRightValue.ToString();
@@ -331,22 +339,29 @@ namespace Calc
                     case '+':
                     {
                         result = (Convert.ToDouble(leftValue) + Convert.ToDouble(rightValue)).ToString();
-                        if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition > rightValuePointPosition))
-                            result = result.Insert(leftValuePointPosition, ",");
-                        else if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition < rightValuePointPosition)) result = result.Insert(rightValuePointPosition, ",");
-                        if ((leftValuePointPosition <= 0) && (rightValuePointPosition > 0)) result = result.Insert(rightValuePointPosition, ",");
-                        if ((leftValuePointPosition > 0) && (rightValuePointPosition <= 0)) result = result.Insert(leftValuePointPosition, ",");
+                        if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition >= rightValuePointPosition))
+                            result = result.Insert(result.Length - leftValuePointPosition, ",");
+                        else if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition <= rightValuePointPosition)) result = result.Insert(result.Length - rightValuePointPosition, ",");
+                        if ((leftValuePointPosition <= 0) && (rightValuePointPosition > 0)) result = result.Insert(result.Length - rightValuePointPosition, ",");
+                        if ((leftValuePointPosition > 0) && (rightValuePointPosition <= 0)) result = result.Insert(result.Length - leftValuePointPosition, ",");
                         break;
                     }
                     case '-':
                     {
                         result = (Convert.ToDouble(leftValue) - Convert.ToDouble(rightValue)).ToString();
-                        if (Convert.ToDouble(leftValue) < Convert.ToDouble(rightValue))
-                        if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition > rightValuePointPosition))
-                            result = result.Insert(leftValuePointPosition, ",");
-                        else if ((leftValuePointPosition > 0) && (rightValuePointPosition > 0) && (leftValuePointPosition < rightValuePointPosition)) result = result.Insert(rightValuePointPosition, ",");
-                        if ((leftValuePointPosition <= 0) && (rightValuePointPosition > 0)) result = result.Insert(rightValuePointPosition, ",");
-                        if ((leftValuePointPosition > 0) && (rightValuePointPosition <= 0)) result = result.Insert(leftValuePointPosition, ",");
+                        //if (Convert.ToDouble(leftValue) < Convert.ToDouble(rightValue))
+                            if ((countLeftValueCharAfterPoint > 0) && (countRightValueCharAfterPoint > 0) && (countLeftValueCharAfterPoint >= countRightValueCharAfterPoint))
+                            {
+                                if (result.Length <= countLeftValueCharAfterPoint)
+                                {
+                                    while (result.Length <= countLeftValueCharAfterPoint) result = result.Insert(0, "0");
+                                }
+                                else { result = result.Insert(result.Length - countLeftValueCharAfterPoint, ","); break; }
+                                result = result.Insert(result.Length - countLeftValueCharAfterPoint, ",");
+                            }
+                            else if ((countLeftValueCharAfterPoint > 0) && (countRightValueCharAfterPoint > 0) && (countLeftValueCharAfterPoint <= countRightValueCharAfterPoint)) result = result.Insert(result.Length - rightValuePointPosition, ",");
+                        if ((countLeftValueCharAfterPoint <= 0) && (countRightValueCharAfterPoint > 0)) result = result.Insert(result.Length - countRightValueCharAfterPoint, ",");
+                        if ((countLeftValueCharAfterPoint > 0) && (countRightValueCharAfterPoint <= 0)) result = result.Insert(result.Length - countLeftValueCharAfterPoint, ",");
                         break;
                     }
                     case '*':
@@ -361,7 +376,8 @@ namespace Calc
                         break;
                     }
                 }
-                return result;
+            while (result[result.Length - 1] == '0') result = result.Remove(result.Length - 1);
+            return result;
             //}
             //catch
             //{
